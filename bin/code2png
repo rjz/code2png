@@ -1,0 +1,41 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const { resolve } = require('path');
+const { tmpdir } = require('os');
+const minimist = require('minimist');
+
+const capture = require('../src/capture');
+const render = require('../src/render');
+
+const argv = minimist(process.argv.slice(2));
+
+const OUTFILE = argv.o || 'code.png';
+
+const code2snip = async (code, outfile) => {
+  const renderFile = 'code2png.html';
+  const serverDir = tmpdir();
+
+  const content = render({
+    code,
+  });
+
+  fs.writeFileSync(resolve(serverDir, renderFile), content);
+
+  await capture({
+    dir: serverDir,
+    path: `/${renderFile}`,
+    imageFile: resolve(process.cwd(), outfile),
+  });
+};
+
+let code = '';
+
+process.stdin.on('readable', () => {
+  const chunk = process.stdin.read();
+  if (chunk !== null) {
+    code += chunk;
+  }
+});
+
+process.stdin.on('end', () => code2snip(code, OUTFILE));

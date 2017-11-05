@@ -1,0 +1,15 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font: 16px/1.3 'droid mono', monospace;
+}
+
+body > pre {
+  background-color: #231f20;
+  border-radius: 4px;
+  color: #fff;
+  margin: 0;
+  padding: 10px;
+  overflow: visible;
+}
