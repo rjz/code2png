@@ -17,6 +17,21 @@ Installation
 $ npm install -g code2png
 ```
 
+Usage
+-------------------------------------------------------------------------------
+
+Pass a source file by name:
+
+```sh
+$ code2png foo.c -o foo.png
+```
+
+...or pipe it in:
+
+```sh
+$ cat foo.c | code2png -o foo.png
+```
+
 TODO
 -------------------------------------------------------------------------------
 

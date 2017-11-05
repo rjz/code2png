@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
-const { resolve } = require('path');
+const {
+  basename,
+  resolve,
+} = require('path');
 const { tmpdir } = require('os');
 const minimist = require('minimist');
 
@@ -10,9 +13,9 @@ const render = require('../src/render');
 
 const argv = minimist(process.argv.slice(2));
 
-const OUTFILE = argv.o || 'code.png';
+const DEFAULT_FILENAME = 'code.png';
 
-const code2snip = async (code, outfile) => {
+function code2png (code, outfile) {
   const renderFile = 'code2png.html';
   const serverDir = tmpdir();
 
@@ -22,20 +25,28 @@ const code2snip = async (code, outfile) => {
 
   fs.writeFileSync(resolve(serverDir, renderFile), content);
 
-  await capture({
+  return capture({
     dir: serverDir,
     path: `/${renderFile}`,
     imageFile: resolve(process.cwd(), outfile),
   });
-};
+}
 
-let code = '';
 
-process.stdin.on('readable', () => {
-  const chunk = process.stdin.read();
-  if (chunk !== null) {
-    code += chunk;
-  }
-});
+if (argv._.length === 1) {
+  const codeFile = argv._[0];
+  const code = fs.readFileSync(codeFile, 'utf8');
+  const outfile = argv.o || `${basename(codeFile)}.png` || DEFAULT_FILENAME;
+  code2png(code, outfile);
+} else {
+  let code = '';
+  process.stdin.on('readable', () => {
+    const chunk = process.stdin.read();
+    if (chunk !== null) {
+      code += chunk;
+    }
+  });
 
-process.stdin.on('end', () => code2snip(code, OUTFILE));
+  const outfile = argv.o || DEFAULT_FILENAME;
+  process.stdin.on('end', () => code2png(code, outfile));
+}
