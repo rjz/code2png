@@ -8,17 +8,12 @@ const {
 const { tmpdir } = require('os');
 const minimist = require('minimist');
 
-const capture = require('../src/capture');
-const render = require('../src/render');
+const code2png = require('..');
 
-const DEFAULT_LANGUAGE = 'javascript';
-const DEFAULT_THEME = 'okaidia';
 const DEFAULT_FILENAME = 'code2png.png';
+const DEFAULT_THEME = 'okaidia';
 
 const argv = minimist(process.argv.slice(2), {
-  default: {
-    theme: DEFAULT_THEME,
-  },
   alias: {
     t: 'theme',
     h: 'help',
@@ -39,30 +34,18 @@ Options:
   process.exit(2);
 }
 
-function code2png (code, outfile) {
-  const renderFile = 'code2png.html';
-  const serverDir = tmpdir();
-
-  const content = render({
-    code,
-    theme: argv.theme,
-    language: DEFAULT_LANGUAGE,
-  });
-
-  fs.writeFileSync(resolve(serverDir, renderFile), content);
-
-  return capture({
-    dir: serverDir,
-    path: `/${renderFile}`,
-    imageFile: resolve(process.cwd(), outfile),
-  });
-}
-
 if (argv.help) {
   usage();
 }
 
+const opts = {
+  theme: argv.theme,
+};
+
 const fileCount = argv._.length;
+
+const writeOutfile = (name, buf) =>
+  fs.writeFileSync(resolve(process.cwd(), name), buf);
 
 if (fileCount > 1) {
   usage();
@@ -70,16 +53,20 @@ if (fileCount > 1) {
   const codeFile = argv._[0];
   const code = fs.readFileSync(codeFile, 'utf8');
   const outfile = argv.o || `${basename(codeFile)}.png` || DEFAULT_FILENAME;
-  code2png(code, outfile);
+  code2png(code, opts).then(buf => writeOutfile(outfile, buf));
 } else {
   let code = '';
+  process.stdin.on('end', () => {
+    const outfile = argv.o || DEFAULT_FILENAME;
+    code2png(code, opts).then(buf => writeOutfile(outfile, buf));
+  });
+
   process.stdin.on('readable', () => {
     const chunk = process.stdin.read();
     if (chunk !== null) {
       code += chunk;
+    } else if (code.length === 0) {
+      usage();
     }
   });
-
-  const outfile = argv.o || DEFAULT_FILENAME;
-  process.stdin.on('end', () => code2png(code, outfile));
 }

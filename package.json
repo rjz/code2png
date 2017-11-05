@@ -2,6 +2,7 @@
   "name": "code2png",
   "version": "1.1.1",
   "description": "Generate PNGs of syntax-highlighted code",
+  "main": "./index.js",
   "engines": {
     "node": ">=7.0.0"
   },
@@ -11,7 +12,6 @@
   "dependencies": {
     "minimist": "^1.2.0",
     "mustache": "^2.3.0",
-    "node-static": "^0.7.10",
     "phantom": "^4.0.5",
     "phantomjs-prebuilt": "^2.1.16",
     "prismjs": "^1.8.3"
