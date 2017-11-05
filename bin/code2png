@@ -21,6 +21,7 @@ const argv = minimist(process.argv.slice(2), {
   },
   alias: {
     t: 'theme',
+    h: 'help',
   },
 });
 
@@ -32,6 +33,7 @@ Options:
 
     -o             the output file (default = '${DEFAULT_FILENAME}')
     -t, --theme    any valid prism.js theme (default = '${DEFAULT_THEME}')
+    -h, --help     print this message!
 
 `);
   process.exit(2);
@@ -54,6 +56,10 @@ function code2png (code, outfile) {
     path: `/${renderFile}`,
     imageFile: resolve(process.cwd(), outfile),
   });
+}
+
+if (argv.help) {
+  usage();
 }
 
 const fileCount = argv._.length;
