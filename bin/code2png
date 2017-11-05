@@ -11,9 +11,31 @@ const minimist = require('minimist');
 const capture = require('../src/capture');
 const render = require('../src/render');
 
-const argv = minimist(process.argv.slice(2));
+const DEFAULT_LANGUAGE = 'javascript';
+const DEFAULT_THEME = 'okaidia';
+const DEFAULT_FILENAME = 'code2png.png';
 
-const DEFAULT_FILENAME = 'code.png';
+const argv = minimist(process.argv.slice(2), {
+  default: {
+    theme: DEFAULT_THEME,
+  },
+  alias: {
+    t: 'theme',
+  },
+});
+
+function usage () {
+  process.stdout.write(`
+Usage: ${basename(process.argv[1])} [filename] [options...]
+
+Options:
+
+    -o             the output file (default = '${DEFAULT_FILENAME}')
+    -t, --theme    any valid prism.js theme (default = '${DEFAULT_THEME}')
+
+`);
+  process.exit(2);
+}
 
 function code2png (code, outfile) {
   const renderFile = 'code2png.html';
@@ -21,6 +43,8 @@ function code2png (code, outfile) {
 
   const content = render({
     code,
+    theme: argv.theme,
+    language: DEFAULT_LANGUAGE,
   });
 
   fs.writeFileSync(resolve(serverDir, renderFile), content);
@@ -32,8 +56,11 @@ function code2png (code, outfile) {
   });
 }
 
+const fileCount = argv._.length;
 
-if (argv._.length === 1) {
+if (fileCount > 1) {
+  usage();
+} else if (fileCount === 1) {
   const codeFile = argv._[0];
   const code = fs.readFileSync(codeFile, 'utf8');
   const outfile = argv.o || `${basename(codeFile)}.png` || DEFAULT_FILENAME;
