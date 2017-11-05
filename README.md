@@ -1,8 +1,8 @@
 code2png
 ===============================================================================
 
-Generate PNG images of source files--convenient for HTML-filtering input forms,
-Twitter, and all kinds of groovy things like that.
+Beautiful code screenshots without leaving the command line. Plays well with
+HTML-filtering input forms, Twitter, and all kinds of groovy things like that.
 
 ```sh
 $ code2png index.js -o readme.png
