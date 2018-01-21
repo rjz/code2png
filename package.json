@@ -1,6 +1,6 @@
 {
   "name": "code2png",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Generate PNGs of syntax-highlighted code",
   "main": "./index.js",
   "engines": {
