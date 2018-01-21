@@ -11,5 +11,5 @@ body > pre {
   color: #fff;
   margin: 0;
   padding: 10px;
-  overflow: visible;
+  overflow: visible !important;
 }
